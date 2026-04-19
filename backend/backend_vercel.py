@@ -1,147 +1,79 @@
 import os
-
-from fastapi import FastAPI
-
+import requests
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-
 from pydantic import BaseModel
-
-from huggingface_hub import InferenceClient
-
 from qdrant_client import QdrantClient
-
-import qdrant_client as qc
-
-from packaging import version
-
+import google.generativeai as genai
 from dotenv import load_dotenv
 
-
-
+# Load environment variables for local development
 load_dotenv()
+
+# Configure the Gemini API key
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+if not GOOGLE_API_KEY:
+    print("Backend Error: GOOGLE_API_KEY is not set.")
+else:
+    genai.configure(api_key=GOOGLE_API_KEY)
 
 app = FastAPI()
 
-
-
 app.add_middleware(
-
     CORSMiddleware,
-
     allow_origins=["*"],
-
     allow_methods=["*"],
-
     allow_headers=["*"],
-
 )
-
-
-
-hf_client = InferenceClient(token=os.getenv("HF_API_TOKEN"))
-
-qdrant_client_inst = QdrantClient(
-
-    url=os.getenv("QDRANT_URL"),
-
-    api_key=os.getenv("QDRANT_API_KEY")
-
-)
-
-
 
 class QueryRequest(BaseModel):
-
     query: str
-
 
 @app.get("/")
 def home():
-    return {"message": "Vercel Backend is Live!"}
-
+    return {"message": "Backend is Live"}
 
 @app.post("/api/query")
-
 async def process_query(request: QueryRequest):
+    Q_URL = os.getenv("QDRANT_URL")
+    Q_KEY = os.getenv("QDRANT_API_KEY")
+
+    if not all([Q_URL, Q_KEY, GOOGLE_API_KEY]):
+        return {"answer": "Backend Error: API keys for Qdrant or Google are missing."}
 
     try:
+        # 1. Get Embeddings with the correct Gemini model
+        embedding_result = genai.embed_content(
+            model="models/gemini-embedding-001",
+            content=request.query,
+            task_type="retrieval_query"
+        )
+        vector = embedding_result['embedding']
 
-        # Step 1: Embeddings
-
-        embeddings = hf_client.feature_extraction(
-
-            request.query, 
-
-            model="sentence-transformers/all-MiniLM-L6-v2"
-
+        # 2. Qdrant Search
+        q_client = QdrantClient(url=Q_URL, api_key=Q_KEY, timeout=10)
+        
+        # Use search with query_vector directly
+        res = q_client.query_points(
+            collection_name="humanoid_robotics", 
+            query_embedding=vector, 
+            limit=3,
+            with_payload=True
         )
 
-        vector = embeddings[0] if isinstance(embeddings[0], list) else embeddings.tolist()
+        context = "\n".join([r.payload.get("text", "") for r in res.points if r.payload])
 
-
-
-        # Step 2: Qdrant Search (Version Safe)
-
-        v = version.parse(qc.__version__)
-
-        if v >= version.parse("1.10.0"):
-
-            search_result = qdrant_client_inst.query_points(
-
-                collection_name="humanoid_robotics",
-
-                query=vector,
-
-                limit=3
-
-            ).points
-
-        else:
-
-            search_result = qdrant_client_inst.search(
-
-                collection_name="humanoid_robotics",
-
-                query_vector=vector,
-
-                limit=3
-
-            )
-
+        # 3. Generate Response with Gemini Pro
+        llm = genai.GenerativeModel('gemini-pro')
+        prompt = f"Context: {context}\n\nQuestion: {request.query}\n\nAnswer concisely:"
         
-
-        context = "\n".join([res.payload.get("text", "") for res in search_result if res.payload])
-
+        llm_resp = llm.generate_content(prompt)
         
-
-        # Step 3: Powerful Free AI Model (Mistral-7B)
-
-        prompt = f"Context: {context}\n\nQuestion: {request.query}\n\nAnswer concisely based on context:"
-
+        # Access the text property of the response
+        answer = llm_resp.text.strip()
         
-
-        # text_generation zyada stable hai free tier par
-
-        response = hf_client.text_generation(
-
-            prompt=prompt,
-
-            model="mistralai/Mistral-7B-v0.1",
-
-            max_new_tokens=300,
-
-            temperature=0.7,
-
-            return_full_text=False
-
-        )
-
-        
-
-        return {"answer": response}
-
-        
+        return {"answer": answer}
 
     except Exception as e:
-
-        return {"answer": f"Backend Error: {str(e)}", "sources": []}
+        # General error handling
+        return {"answer": f"An unexpected error occurred: {str(e)}"}
