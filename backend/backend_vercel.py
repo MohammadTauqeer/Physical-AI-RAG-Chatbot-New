@@ -54,14 +54,14 @@ async def process_query(request: QueryRequest):
         q_client = QdrantClient(url=Q_URL, api_key=Q_KEY, timeout=10)
         
         # Use search with query_vector directly
-        res = q_client.query_points(
-            collection_name="humanoid_robotics", 
-            query_embedding=vector, 
+        res = q_client.search(
+            collection_name="humanoid_robotics",
+            query_vector=vector,
             limit=3,
             with_payload=True
         )
 
-        context = "\n".join([r.payload.get("text", "") for r in res.points if r.payload])
+        context = "\n".join([r.payload.get("text", "") for r in res if r.payload])
 
         # 3. Generate Response with Gemini Pro
         llm = genai.GenerativeModel('gemini-pro')
