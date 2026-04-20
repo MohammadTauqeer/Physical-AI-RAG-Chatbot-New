@@ -2,7 +2,7 @@ import requests
 import json
 
 def test_query_endpoint():
-    url = "http://localhost:8000/api/query"
+    url = "https://hackathon-i-ai-book-rag-chatbotfina.vercel.app/api/query"
 
     payload = {
         "question": "What are the key characteristics and design principles of Humanoid Robotics, according to the textbook?",
@@ -20,7 +20,7 @@ def test_query_endpoint():
         print(f"Response Body: {json.dumps(response.json(), indent=2)}")
 
     except requests.exceptions.ConnectionError:
-        print("Error: Could not connect to the server. Please make sure the FastAPI server is running on http://localhost:8000")
+        print("Error: Could not connect to the server. Please make sure the FastAPI server is running on https://hackathon-i-ai-book-rag-chatbotfina.vercel.app")
     except Exception as e:
         print(f"An error occurred: {str(e)}")
 

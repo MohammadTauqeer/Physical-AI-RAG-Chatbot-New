@@ -59,8 +59,8 @@
 - If Qdrant container fails to start, verify Docker is running and you have proper permissions
 
 ### API Access:
-- The API will be available at: http://localhost:8000
-- API documentation available at: http://localhost:8000/docs
+- The API will be available at: https://hackathon-i-ai-book-rag-chatbotfina.vercel.app
+- API documentation available at: https://hackathon-i-ai-book-rag-chatbotfina.vercel.app/docs
 
 ## Usage
 

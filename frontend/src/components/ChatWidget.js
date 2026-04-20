@@ -27,8 +27,8 @@ const handleSendMessage = async () => {
         // Sahi URL aur Port: 8000
 // Check karein ke frontend local par chal raha hai ya internet par
 const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-    ? 'http://127.0.0.1:8000/api/query' 
-    : 'https://hackathon-i-ai-book-rag-chatbotfina.vercel.app/api/query'; // 'l' hata diya
+    ? 'http://127.0.0.1:8000/api/query'
+    : 'https://hackathon-i-ai-book-rag-chatbotfina.vercel.app/api/query'; // Updated to new backend URL
 
 const response = await fetch(API_URL, {
     method: 'POST',

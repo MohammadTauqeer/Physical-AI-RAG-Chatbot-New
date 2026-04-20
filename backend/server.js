@@ -15,7 +15,7 @@ const qdrantClient = new QdrantClient({
 
 const COLLECTION_NAME = 'humanoid_robotics_textbook';
 const EMBEDDING_MODEL = 'text-embedding-004';
-const GEMINI_MODEL = 'gemini-2.5-flash-preview-09-2025'; // Optimized model
+const GEMINI_MODEL = 'gemini-2.0-flash'; // Updated model
 
 const app = express();
 const PORT = process.env.PORT || 3003;

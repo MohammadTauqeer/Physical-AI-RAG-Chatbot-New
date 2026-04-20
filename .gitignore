@@ -4,6 +4,10 @@ backend/.env
 frontend/.env
 .env.local
 
+# Python caches and system files
+__pycache__/
+.DS_Store
+
 # Dependency folders
 node_modules/
 venv/

@@ -69,8 +69,8 @@ app.post('/api/chat', async (req, res) => {
         // Construct the prompt for Gemini with the retrieved context
         const fullPrompt = `Based on the following context, please answer the question. If the context doesn't contain enough information, say so.\n\nContext:\n${context}\n\nQuestion: ${query}\n\nAnswer:`;
 
-        // Send the context + question to Gemini (gemini-1.5-flash) to get the final answer
-        const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
+        // Send the context + question to Gemini (gemini-2.0-flash) to get the final answer
+        const model = ai.getGenerativeModel({ model: "gemini-2.0-flash" });
         const result = await model.generateContent(fullPrompt);
         const response = await result.response.text();
 

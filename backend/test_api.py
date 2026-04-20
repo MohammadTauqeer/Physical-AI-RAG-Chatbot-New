@@ -5,8 +5,8 @@ def test_api_endpoints():
     """
     Simple test script to verify the API endpoints are working
     """
-    base_url = "http://localhost:8000"
-    
+    base_url = "https://hackathon-i-ai-book-rag-chatbotfina.vercel.app"
+
     # Test health endpoint
     print("Testing health endpoint...")
     try:
@@ -18,7 +18,7 @@ def test_api_endpoints():
             print(f"✗ Health endpoint failed with status {response.status_code}")
     except Exception as e:
         print(f"✗ Error testing health endpoint: {e}")
-    
+
     # Test root endpoint
     print("\nTesting root endpoint...")
     try:
@@ -30,7 +30,7 @@ def test_api_endpoints():
             print(f"✗ Root endpoint failed with status {response.status_code}")
     except Exception as e:
         print(f"✗ Error testing root endpoint: {e}")
-    
+
     # Test query endpoint (with a sample request)
     print("\nTesting query endpoint...")
     try:
@@ -56,7 +56,7 @@ def test_api_endpoints():
             print(f"✗ Query endpoint failed with status {response.status_code}")
     except Exception as e:
         print(f"✗ Error testing query endpoint: {e}")
-    
+
     print("\nAPI testing complete!")
 
 if __name__ == "__main__":

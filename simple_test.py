@@ -5,7 +5,7 @@ def test_api_endpoints():
     """
     Simple test script to verify the API endpoints are working
     """
-    base_url = "http://localhost:8000"
+    base_url = "https://hackathon-i-ai-book-rag-chatbotfina.vercel.app"
 
     # Test health endpoint
     print("Testing health endpoint...")
