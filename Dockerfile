@@ -35,7 +35,7 @@ ENV GENERATION_MODEL_NAME=HuggingFaceH4/zephyr-7b-beta
 ENV COLLECTION_NAME=humanoid_robotics
 
 # Expose the port
-EXPOSE 8000
+EXPOSE 7860
 
 # Set the entry point to run the FastAPI application using Uvicorn
-CMD ["uvicorn", "backend:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "backend:app", "--host", "0.0.0.0", "--port", "7860"]

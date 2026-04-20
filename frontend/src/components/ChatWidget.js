@@ -24,18 +24,19 @@ const handleSendMessage = async () => {
     setLoading(true);
 
     try {
-        // Sahi URL aur Port: 8000
-// Check karein ke frontend local par chal raha hai ya internet par
-const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-    ? 'http://127.0.0.1:8000/api/query'
-    : 'https://hackathon-i-ai-book-rag-chatbotfina.vercel.app/api/query'; // Updated to new backend URL
+        // Use environment variable if available, otherwise fallback to logic
+        const PROD_API_URL = 'https://hackathon-i-ai-book-rag-chatbotfina.vercel.app/api/query'; // Replace with Hugging Face URL if needed
+        const LOCAL_API_URL = 'http://127.0.0.1:7860/api/query';
 
-const response = await fetch(API_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    // Backend jo field mang raha hai (query ya question), wo yahan likhein
-    body: JSON.stringify({ query: queryToSend }), 
-});
+        const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+            ? LOCAL_API_URL
+            : PROD_API_URL;
+
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ question: queryToSend }),
+        });
 
         const data = await response.json();
         
@@ -52,10 +53,10 @@ const response = await fetch(API_URL, {
         }
     } catch (error) {
         console.error("API Error:", error);
-        setMessages(prev => [...prev, { 
-            id: Date.now() + 1, 
-            text: "Server se rabta nahi ho pa raha. Check karein ke backend (Port 8000) chal raha hai?", 
-            sender: 'bot' 
+        setMessages(prev => [...prev, {
+            id: Date.now() + 1,
+            text: "Server se rabta nahi ho pa raha. Check karein ke backend (Port 7860) chal raha hai?",
+            sender: 'bot'
         }]);
     } finally {
         setLoading(false);
@@ -81,7 +82,7 @@ const response = await fetch(API_URL, {
                       <small><strong>Sources:</strong></small>
                       {message.sources.map((src, i) => (
                         <div key={i} style={{fontSize: '10px', color: '#666'}}>
-                          • {src.text_preview}
+                          • {src.text_preview || src.text || "Source text"}
                         </div>
                       ))}
                     </div>
